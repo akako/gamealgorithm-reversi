@@ -6,13 +6,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// ゲームフィールド制御クラス
+/// 盤面の制御クラス
 /// </summary>
 [RequireComponent(typeof(GridLayoutGroup))]
 public class Game_Field : UIBehaviour
 {
     /// <summary>
-    /// 石の色
+    /// 石の色定義
     /// </summary>
     public enum StoneColor
     {
@@ -30,6 +30,7 @@ public class Game_Field : UIBehaviour
     protected override void Awake()
     {
         base.Awake();
+        // 8x8のマスを生成
         for (var y = 0; y < 8; y++)
         {
             for (var x = 0; x < 8; x++)

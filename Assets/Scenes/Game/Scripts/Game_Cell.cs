@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// マス目
+/// マス目クラス
 /// </summary>
 [RequireComponent(typeof(Button))]
 public class Game_Cell : UIBehaviour
