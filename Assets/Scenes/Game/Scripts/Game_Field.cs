@@ -37,6 +37,7 @@ public class Game_Field : UIBehaviour
             {
                 var cell = Instantiate(cellPrefab);
                 cell.transform.SetParent(transform);
+                cell.transform.localScale = Vector3.one;
                 cell.Initialize(x, y);
                 cells.Add(cell);
             }
