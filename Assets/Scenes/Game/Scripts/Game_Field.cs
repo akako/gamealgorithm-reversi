@@ -11,6 +11,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(GridLayoutGroup))]
 public class Game_Field : UIBehaviour
 {
+    public const int SIZE_X = 8;
+    public const int SIZE_Y = 8;
+
     /// <summary>
     /// 石の色定義
     /// </summary>
@@ -24,16 +27,18 @@ public class Game_Field : UIBehaviour
     [SerializeField]
     Game_Cell cellPrefab;
 
-    List<Game_Cell> cells = new List<Game_Cell>();
+    [HideInInspector]
+    public List<Game_Cell> cells = new List<Game_Cell>();
+
     int turnStoneForDirectionIfPossibleCoroutineCount;
 
     protected override void Awake()
     {
         base.Awake();
         // 8x8のマスを生成
-        for (var y = 0; y < 8; y++)
+        for (var y = 0; y < SIZE_Y; y++)
         {
-            for (var x = 0; x < 8; x++)
+            for (var x = 0; x < SIZE_X; x++)
             {
                 var cell = Instantiate(cellPrefab);
                 cell.transform.SetParent(transform);
