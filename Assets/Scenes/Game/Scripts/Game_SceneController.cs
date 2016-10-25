@@ -122,7 +122,6 @@ public class Game_SceneController : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
             var resultCell = ais[CurrentPlayerStoneColor].GetNextMove(field);
-            Debug.Log(string.Format("{0}, {1}", resultCell.x, resultCell.y));
             OnCellClick(field.cells.First(x => x.X == resultCell.x && x.Y == resultCell.y));
         }
     }

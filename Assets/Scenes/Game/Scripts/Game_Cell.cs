@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 public class Game_Cell : UIBehaviour
 {
     /// <summary>
-    /// クリック可能か否か
+    /// 石を置けるかどうか
     /// </summary>
     /// <value><c>true</c> if this instance is clickable; otherwise, <c>false</c>.</value>
     public bool IsPuttable
@@ -25,15 +25,15 @@ public class Game_Cell : UIBehaviour
         }
     }
 
+    /// <summary>
+    /// クリック可能かどうか
+    /// </summary>
+    /// <value><c>true</c> if this instance is clickable; otherwise, <c>false</c>.</value>
     public bool IsClickable
     {
         set
         {
             button.enabled = value; 
-        }
-        get
-        {
-            return button.enabled;
         }
     }
 

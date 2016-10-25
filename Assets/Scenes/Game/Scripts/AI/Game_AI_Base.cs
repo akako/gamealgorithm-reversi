@@ -6,10 +6,23 @@ using System.Linq;
 
 abstract public class Game_AI_Base
 {
+    /// <summary>
+    /// AIの石の色
+    /// </summary>
     protected Game_Field.StoneColor stoneColor;
 
+    /// <summary>
+    /// 次の手を取得します
+    /// </summary>
+    /// <returns>The next move.</returns>
+    /// <param name="gameField">Game field.</param>
     abstract public Game_AI_Base.CellInfo GetNextMove(Game_Field gameField);
 
+    /// <summary>
+    /// Game_Fieldオブジェクトを元に盤面シミュレータを作成します
+    /// </summary>
+    /// <returns>The simulate field with game field.</returns>
+    /// <param name="gameField">Game field.</param>
     protected SimulateField GenerateSimulateFieldWithGameField(Game_Field gameField)
     {
         var cells = new Game_Field.StoneColor[Game_Field.SIZE_X, Game_Field.SIZE_Y];
@@ -20,8 +33,15 @@ abstract public class Game_AI_Base
         return new SimulateField(cells);
     }
 
+    /// <summary>
+    /// マス情報クラス
+    /// </summary>
     public class CellInfo
     {
+        /// <summary>
+        /// 角かどうか
+        /// </summary>
+        /// <value><c>true</c> if this instance is corner; otherwise, <c>false</c>.</value>
         public bool IsCorner
         { 
             get
@@ -33,6 +53,10 @@ abstract public class Game_AI_Base
             }
         }
 
+        /// <summary>
+        /// 角の内側のマスかどうか
+        /// </summary>
+        /// <value><c>true</c> if this instance is corner inside; otherwise, <c>false</c>.</value>
         public bool IsCornerInside
         { 
             get
@@ -56,8 +80,14 @@ abstract public class Game_AI_Base
         }
     }
 
+    /// <summary>
+    /// 盤面シミュレータクラス
+    /// </summary>
     protected class SimulateField
     {
+        /// <summary>
+        /// ゲーム状況の定義
+        /// </summary>
         public enum StageEnum
         {
             Opening,
@@ -65,6 +95,10 @@ abstract public class Game_AI_Base
             End
         }
 
+        /// <summary>
+        /// ゲーム状況
+        /// </summary>
+        /// <value>The stage.</value>
         public StageEnum Stage
         {
             get
@@ -93,6 +127,11 @@ abstract public class Game_AI_Base
             this.cells = cells;
         }
 
+        /// <summary>
+        /// 石を置けるマスを返します
+        /// </summary>
+        /// <returns>The puttable cell infos.</returns>
+        /// <param name="stoneColor">Stone color.</param>
         public List<CellInfo> GetPuttableCellInfos(Game_Field.StoneColor stoneColor)
         {
             var infos = new List<CellInfo>();
@@ -109,11 +148,23 @@ abstract public class Game_AI_Base
             return infos;
         }
 
+        /// <summary>
+        /// 指定した色の石を数えます
+        /// </summary>
+        /// <returns>The stone.</returns>
+        /// <param name="stoneColor">Stone color.</param>
         public int CountStone(Game_Field.StoneColor stoneColor)
         {
             return cells.Cast<Game_Field.StoneColor>().Count(x => x == stoneColor);
         }
 
+        /// <summary>
+        /// 指定マスの周り8マスに指定した色の石が何個あるか数えます
+        /// </summary>
+        /// <returns>The stone around cell.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="stoneColor">Stone color.</param>
         public int CountStoneAroundCell(int x, int y, Game_Field.StoneColor stoneColor)
         {
             var count = 0;
@@ -123,7 +174,7 @@ abstract public class Game_AI_Base
                 {
                     var nextX = x + xDiff;
                     var nextY = y + yDiff;
-                    if (nextX < 0 || Game_Field.SIZE_X <= nextX || nextY < 0 || Game_Field.SIZE_Y <= nextY)
+                    if (!IsCorrectCoordinate(nextX, nextY))
                     {
                         continue;
                     }
@@ -136,6 +187,13 @@ abstract public class Game_AI_Base
             return count;
         }
 
+        /// <summary>
+        /// 石を置きます
+        /// </summary>
+        /// <returns>The stone.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="stoneColor">Stone color.</param>
         public List<CellInfo> PutStone(int x, int y, Game_Field.StoneColor stoneColor)
         {
             if (!IsStonePuttable(x, y, stoneColor))
@@ -146,6 +204,13 @@ abstract public class Game_AI_Base
             return TurnOverStoneIfPossible(x, y);
         }
 
+        /// <summary>
+        /// 指定のマスに石が置けるかどうかをチェックします
+        /// </summary>
+        /// <returns><c>true</c> if this instance is stone puttable the specified x y stoneColor; otherwise, <c>false</c>.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="stoneColor">Stone color.</param>
         bool IsStonePuttable(int x, int y, Game_Field.StoneColor stoneColor)
         {
             if (IsCorrectCoordinate(x, y) && cells[x, y] == Game_Field.StoneColor.None)
@@ -165,6 +230,15 @@ abstract public class Game_AI_Base
             }
         }
 
+        /// <summary>
+        /// 自分（指定色）の石が相手の石を挟める場所にあるかチェックします
+        /// </summary>
+        /// <returns><c>true</c>, if own stone at the other side of enemy stone for direction was existsed, <c>false</c> otherwise.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="stoneColor">Stone color.</param>
+        /// <param name="xDirection">X direction.</param>
+        /// <param name="yDirection">Y direction.</param>
         bool ExistsOwnStoneAtTheOtherSideOfEnemyStoneForDirection(int x, int y, Game_Field.StoneColor stoneColor, int xDirection, int yDirection)
         {
             var existsEnemyStone = false;
@@ -187,6 +261,12 @@ abstract public class Game_AI_Base
             }
         }
 
+        /// <summary>
+        /// 石をひっくり返します
+        /// </summary>
+        /// <returns>The over stone if possible.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
         List<CellInfo> TurnOverStoneIfPossible(int x, int y)
         {
             var infos = new List<CellInfo>();
@@ -202,6 +282,14 @@ abstract public class Game_AI_Base
             return infos;
         }
 
+        /// <summary>
+        /// 指定方向にある石をひっくり返します
+        /// </summary>
+        /// <returns>The stone for direction if possible.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="xDirection">X direction.</param>
+        /// <param name="yDirection">Y direction.</param>
         List<CellInfo> TurnStoneForDirectionIfPossible(int x, int y, int xDirection, int yDirection)
         {
             var infos = new List<CellInfo>();
@@ -228,6 +316,12 @@ abstract public class Game_AI_Base
             }
         }
 
+        /// <summary>
+        /// 盤面に存在する座標かどうかチェックします
+        /// </summary>
+        /// <returns><c>true</c> if this instance is correct coordinate the specified x y; otherwise, <c>false</c>.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
         bool IsCorrectCoordinate(int x, int y)
         {
             return 0 <= x && x < Game_Field.SIZE_X && 0 <= y && y < Game_Field.SIZE_Y;

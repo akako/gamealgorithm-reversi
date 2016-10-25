@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// セオリーで攻めるAI
+/// </summary>
 public class Game_AI_Theory : Game_AI_Base
 {
     public Game_AI_Theory(Game_Field.StoneColor stoneColor)
@@ -10,6 +13,11 @@ public class Game_AI_Theory : Game_AI_Base
         this.stoneColor = stoneColor;
     }
 
+    /// <summary>
+    /// 次の手を取得します
+    /// </summary>
+    /// <returns>The next move.</returns>
+    /// <param name="gameField">Game field.</param>
     public override CellInfo GetNextMove(Game_Field gameField)
     {
         var simulateField = GenerateSimulateFieldWithGameField(gameField);
