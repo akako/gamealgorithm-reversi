@@ -75,6 +75,7 @@ public class Game_Field : UIBehaviour
     {
         foreach (var cell in cells)
         {
+            cell.IsPuttable = false;
             cell.IsClickable = false;
         }
     }
@@ -99,12 +100,12 @@ public class Game_Field : UIBehaviour
     }
 
     /// <summary>
-    /// クリック可能なマスの数を数えます
+    /// 石を配置可能なマスの数を数えます
     /// </summary>
-    /// <returns>The clickable cells.</returns>
-    public int CountClickableCells()
+    /// <returns>The puttable cells.</returns>
+    public int CountPuttableCells()
     {
-        return cells.Count(x => x.IsClickable);
+        return cells.Count(x => x.IsPuttable);
     }
 
     /// <summary>
@@ -114,7 +115,12 @@ public class Game_Field : UIBehaviour
     {
         foreach (var cell in cells)
         {
-            cell.IsClickable = IsStonePuttableCell(cell, stoneColor);
+            var isPuttable = IsStonePuttableCell(cell, stoneColor);
+            cell.IsPuttable = isPuttable;
+            if (!Game_SceneController.Instance.IsAITurn)
+            {
+                cell.IsClickable = isPuttable;
+            }
         }
     }
 
@@ -184,10 +190,7 @@ public class Game_Field : UIBehaviour
     IEnumerator TurnOverStoneIfPossibleCoroutine(Game_Cell cell)
     {
         // 誤操作防止のため全マスをクリック不可にする
-        foreach (var c in cells)
-        {
-            c.IsClickable = false;
-        }
+        Lock();
 
         // 8方向それぞれに対し、ひっくり返す処理を実行
         turnStoneForDirectionIfPossibleCoroutineCount = 8;

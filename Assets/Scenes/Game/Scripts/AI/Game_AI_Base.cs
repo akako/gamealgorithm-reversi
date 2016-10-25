@@ -4,18 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-abstract public class Game_AI_Base<T> where T : Game_AI_Base<T>, new()
+abstract public class Game_AI_Base
 {
     protected Game_Field.StoneColor stoneColor;
 
-    public static T NewInstance(Game_Field.StoneColor stoneColor)
-    {
-        var instance = new T();
-        instance.stoneColor = stoneColor;
-        return instance;
-    }
-
-    abstract public CellInfo GetNextMove(Game_Field gameField);
+    abstract public Game_AI_Base.CellInfo GetNextMove(Game_Field gameField);
 
     protected SimulateField GenerateSimulateFieldWithGameField(Game_Field gameField)
     {
@@ -128,7 +121,13 @@ abstract public class Game_AI_Base<T> where T : Game_AI_Base<T>, new()
             {
                 for (var yDiff = -1; yDiff <= 1; yDiff++)
                 {
-                    if ((xDiff != 0 || yDiff != 0) && cells[x + xDiff, y + yDiff] == stoneColor)
+                    var nextX = x + xDiff;
+                    var nextY = y + yDiff;
+                    if (nextX < 0 || Game_Field.SIZE_X <= nextX || nextY < 0 || Game_Field.SIZE_Y <= nextY)
+                    {
+                        continue;
+                    }
+                    if ((xDiff != 0 || yDiff != 0) && cells[nextX, nextY] == stoneColor)
                     {
                         count++;
                     } 

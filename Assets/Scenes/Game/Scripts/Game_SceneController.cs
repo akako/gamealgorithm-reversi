@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Linq;
+using System.Collections.Generic;
 
 /// <summary>
 /// ゲームシーン制御クラス
@@ -12,14 +14,13 @@ public class Game_SceneController : MonoBehaviour
         get { return instance; }
     }
 
-    static Game_SceneController instance;
-
-    [SerializeField]
-    Game_Field field;
-    [SerializeField]
-    Game_Message message;
-
-    int turnNumber;
+    public bool IsAITurn
+    {
+        get
+        {
+            return ais.ContainsKey(CurrentPlayerStoneColor);
+        }
+    }
 
     /// <summary>
     /// 今の手番プレイヤーの石の色
@@ -29,6 +30,16 @@ public class Game_SceneController : MonoBehaviour
     {
         get { return (Game_Field.StoneColor)((turnNumber + 1) % 2 + 1); }
     }
+
+    static Game_SceneController instance;
+
+    [SerializeField]
+    Game_Field field;
+    [SerializeField]
+    Game_Message message;
+
+    int turnNumber;
+    Dictionary<Game_Field.StoneColor, Game_AI_Base> ais = new Dictionary<Game_Field.StoneColor, Game_AI_Base>();
 
     void Awake()
     {
@@ -46,8 +57,14 @@ public class Game_SceneController : MonoBehaviour
     public void GameStart()
     {
         turnNumber = 0;
+
+        // 片方の色をAIにする
+        ais.Clear();
+        var aiColor = Random.Range(0, 2) == 0 ? Game_Field.StoneColor.Black : Game_Field.StoneColor.White;
+        ais.Add(aiColor, new Game_AI_Theory(aiColor));
+
         field.Initialize();
-        IncrementTurnNumber();
+        StartCoroutine(NextTurnCoroutine());
     }
 
     /// <summary>
@@ -81,22 +98,32 @@ public class Game_SceneController : MonoBehaviour
             // マスが全て埋まったならゲーム終了
             yield return message.Show("GAME FINISHED");
             StartCoroutine(GameFinishedCoroutine());
+            yield break;
         }
         else
         {
             IncrementTurnNumber();
-            if (field.CountClickableCells() == 0)
+            if (field.CountPuttableCells() == 0)
             {
                 // 石を置ける場所が無いならパス
                 yield return message.Show(string.Format("{0} cannot put stone. TURN SKIPPED", CurrentPlayerStoneColor.ToString()));
                 IncrementTurnNumber();
-                if (field.CountClickableCells() == 0)
+                if (field.CountPuttableCells() == 0)
                 {
                     // もう一方も石を置ける場所が無いならゲーム終了
                     yield return message.Show(string.Format("{0} cannot put stone too. GAME FINISHED", CurrentPlayerStoneColor.ToString()));
                     StartCoroutine(GameFinishedCoroutine());
+                    yield break;
                 }
             }
+        }
+        // AIの手番の場合は、1秒待ってから処理を実行
+        if (IsAITurn)
+        {
+            yield return new WaitForSeconds(1f);
+            var resultCell = ais[CurrentPlayerStoneColor].GetNextMove(field);
+            Debug.Log(string.Format("{0}, {1}", resultCell.x, resultCell.y));
+            OnCellClick(field.cells.First(x => x.X == resultCell.x && x.Y == resultCell.y));
         }
     }
 

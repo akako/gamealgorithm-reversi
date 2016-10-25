@@ -13,11 +13,22 @@ public class Game_Cell : UIBehaviour
     /// クリック可能か否か
     /// </summary>
     /// <value><c>true</c> if this instance is clickable; otherwise, <c>false</c>.</value>
-    public bool IsClickable
+    public bool IsPuttable
     {
         set
         {
             frame.color = value ? Color.red : Color.black;
+        }
+        get
+        {
+            return frame.color == Color.red;
+        }
+    }
+
+    public bool IsClickable
+    {
+        set
+        {
             button.enabled = value; 
         }
         get
