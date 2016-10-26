@@ -58,10 +58,10 @@ public class Game_SceneController : MonoBehaviour
     {
         turnNumber = 0;
 
-        // 片方の色をAIにする
+        // AI設定
         ais.Clear();
-        var aiColor = Random.Range(0, 2) == 0 ? Game_Field.StoneColor.Black : Game_Field.StoneColor.White;
-        ais.Add(aiColor, new Game_AI_Theory(aiColor));
+        ais.Add(Game_Field.StoneColor.Black, new Game_AI_Random(Game_Field.StoneColor.Black));
+        //ais.Add(Game_Field.StoneColor.White, new Game_AI_Theory(Game_Field.StoneColor.White));
 
         field.Initialize();
         StartCoroutine(NextTurnCoroutine());
